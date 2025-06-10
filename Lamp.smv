@@ -1,0 +1,72 @@
+----Lamp.smv
+MODULE main
+VAR
+Tmr1 : 1..5;
+Tmr2 : 1..4;
+Tmr3 : 1..6;
+Tmr4 : 1..3;
+
+Sw1: {on, off};
+Sw2: {on, off};
+Sw3: {on, off};
+Sw4: {on, off};
+
+ASSIGN
+init(Tmr1) := 2;
+init(Tmr2) := 3;
+init(Tmr3) := 1;
+init(Tmr4) := 2;
+init(Sw1) := off;
+init(Sw2) := off;
+init(Sw3) := off;
+init(Sw4) := off;
+
+next(Tmr1) := case
+            Tmr1 = 5 : 1;
+            TRUE     : (Tmr1 + 1);
+            esac;
+
+
+next(Tmr2) := case
+            Tmr2 = 4 : 1;
+            TRUE     : (Tmr2 + 1);
+            esac;
+
+
+next(Tmr3) := case
+            Tmr3 = 6 : 1;
+            TRUE     : (Tmr3 + 1);
+            esac;
+
+
+
+next(Tmr4) := case
+            Tmr4 = 3 : 1;
+            TRUE     : (Tmr4 + 1);
+            esac;
+
+next(Sw1) := case
+            Tmr1 = 5 : on;
+            TRUE     : off;
+            esac;
+
+next(Sw2) := case
+            Tmr2 = 4 : on;
+            TRUE     : off;
+            esac;
+
+next(Sw3) := case
+            Tmr3 = 6 : on;
+            TRUE     : off;
+            esac;
+
+next(Sw4) := case
+            Tmr4 = 3 : on;
+            TRUE     : off;
+            esac;
+
+--3.1
+LTLSPEC F (Sw1=on & Sw2=on & (Sw3=on | Sw4=on))
+--3.2
+LTLSPEC F (Sw1=on & Sw2=on & Sw3=on & Sw4=on)
+

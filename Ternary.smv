@@ -1,0 +1,37 @@
+--3進カウンタ
+
+MODULE main
+VAR 
+digit0  :   0..2;
+digit1  :   0..2;
+digit2  :   0..2;
+
+ASSIGN
+init(digit0)    := 0;
+init(digit1)    := 0;
+init(digit2)    := 0;
+
+next(digit0)    := case
+    digit0 < 2 : digit0 + 1;
+    digit0 = 2 : 0;
+    TRUE    :   digit0;
+    esac;
+
+next(digit1)    := case
+    digit1 < 2 & digit0 = 2: digit1 + 1;
+    digit1 = 2 & digit0 = 2: 0;
+    TRUE    :   digit1;
+    esac;
+
+next(digit2)    := case
+    digit2 < 2 & digit1 = 2 & digit0 = 2: digit2 + 1;
+    digit2 = 2 & digit1 = 2 & digit0 = 2: 0;
+    TRUE    :   digit2;
+    esac;
+
+--LTLSPEC !F(digit0 = 1 & digit1 = 1 & digit2 = 1)
+
+--1
+LTLSPEC !F(digit2 = 1 & !F(digit2 = 0 & digit1 = 0 & digit0 =0))
+--2
+LTLSPEC G(F(digit2 = 0))

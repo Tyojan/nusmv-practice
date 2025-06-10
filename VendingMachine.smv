@@ -1,0 +1,149 @@
+--vending machine
+MODULE main
+
+VAR
+canA :  0..5;
+canB :  0..5;
+stored   :   0..3;
+change  :   0..3;
+
+state  :   {unpower, standby, coin};
+power   :   boolean;
+coinIn  :   boolean;
+buttonA  :   boolean;
+buttonB  :   boolean;
+product :   {no, JuiceA, JuiceB};
+
+clk :   boolean;
+
+ASSIGN
+init(canA)  := 5;
+init(canB)  := 5;
+init(stored)    :=   0;
+init(change)    :=   0;
+
+init(state) :=    unpower;
+init(power) :=    FALSE;
+init(coinIn)    :=   FALSE;
+init(buttonA)   :=  FALSE;
+init(buttonB)   :=  FALSE;
+init(product)   :=  no;
+
+init(clk) := FALSE;
+next(clk) := !clk;
+--clk = FALSEで動く
+next(power) :=
+    case
+        clk = FALSE  :   {TRUE, FALSE};
+        clk = TRUE  :   power;
+    esac;        
+
+next(coinIn):=
+    case
+        clk = FALSE  :   {TRUE, FALSE};
+        clk = TRUE  :   FALSE;
+    esac;
+
+next(buttonA)   :=
+    case
+        clk = FALSE  :   {TRUE, FALSE};
+        clk = TRUE  :   FALSE;
+    esac;
+
+next(buttonB)   :=
+    case
+        clk = FALSE  :   {TRUE, FALSE};
+        clk = TRUE  :   FALSE;
+    esac;
+
+--clk = TRUEで動く
+
+next(state):=
+    case
+        clk & power & state = unpower : standby;
+        clk & !power & state != unpower : unpower;
+        clk & power & coinIn & canA = 0 & canB = 0: standby;
+        clk & power & state = standby & coinIn: coin;
+        clk & power & state = coin & coinIn & stored = 3: coin;
+        clk & power & state = coin & coinIn & stored < 3: coin;
+        clk & power & state = coin & !coinIn & buttonA & canA > 0: standby;
+        clk & power & state = coin & !coinIn & buttonA & canA = 0: standby;
+        clk & power & state = coin & !coinIn & !buttonA & buttonB & canB > 0: standby;
+        clk & power & state = coin & !coinIn & !buttonA & buttonB & canB = 0: standby;
+        TRUE    :   state;
+    esac;
+
+
+next(canA):=
+    case
+        clk & state = coin & !coinIn & buttonA & !buttonB & canA > 0: canA - 1;
+        clk & state = coin & !coinIn & buttonA & !buttonB & canA = 0: 0;
+        TRUE    :   canA;
+    esac;        
+
+next(canB):=
+    case
+        clk & state = coin & !coinIn & !buttonA & buttonB & canB > 0: canB - 1;
+        clk & state = coin & !coinIn & !buttonA & buttonB & canB = 0: 0;
+        TRUE    :   canB;
+    esac;
+
+next(stored):=
+    case
+        clk & state = coin & !power : 0;
+        clk & state = standby & power & coinIn : 0;
+        clk & state = standby & power & coinIn : 1;
+        clk & state = coin & coinIn & stored = 3: 3;
+        clk & state = coin & coinIn & stored < 3: stored + 1;
+        clk & state = coin & !coinIn & buttonA & canA > 0: 0;
+        clk & state = coin & !coinIn & buttonA & canA = 0: 0;
+        clk & state = coin & !coinIn & !buttonA & buttonB & canB > 0: 0;
+        clk & state = coin & !coinIn & !buttonA &buttonB & canB = 0: 0;
+        TRUE    :   stored;
+    esac;
+
+
+next(change):=
+    case        
+        clk & state = coin & !power : stored;
+        clk & state = unpower & coinIn : 1;
+        clk & state = coin & coinIn & stored = 3: 1;
+        clk & coinIn & canA = 0 & canB = 0: 1;
+        clk & state = coin & coinIn & buttonA & canA > 0 & stored != 0: stored - 1;
+        clk & state = coin & coinIn & buttonA & canA = 0 : stored;
+        clk & state = coin & coinIn & !buttonA & buttonB & canB > 0 & stored != 0: stored - 1;
+        clk & state = coin & coinIn & !buttonA & buttonB & canB = 0 : stored;
+        TRUE    :   0;
+    esac;
+
+next(product):=
+    case        
+        clk & state = coin & power & buttonA & canA > 0: JuiceA;
+        clk & state = coin & power & !buttonA & buttonB & canB > 0: JuiceB;
+        TRUE    :   no;
+    esac;
+
+
+--1
+LTLSPEC G((clk & state = unpower & power) -> F(state = standby))
+LTLSPEC G((clk & state = unpower & !power) -> F(state = unpower))
+
+--2
+LTLSPEC G(clk & state = standby & coinIn & canA = 0 & canB = 0 -> F(change = 1))
+--3
+LTLSPEC G(clk & power & state = standby & coinIn & (canA > 0 | canB > 0) -> F(state = coin))
+
+--4
+LTLSPEC G(clk & power & state = coin & coinIn & stored = 3 -> X(X(change = 1)))
+--5
+LTLSPEC G(clk & power & state = coin & coinIn & stored < 3 -> F(stored <= 3))
+LTLSPEC G(clk & power & state = coin & coinIn & stored < 3 -> F(change = 0))
+--7
+LTLSPEC G((clk & state = unpower & !power & coinIn) -> F(change = 1))
+--8
+LTLSPEC G((clk & state = standby & !power) -> F(state = unpower))
+--11
+LTLSPEC G(state = unpower -> stored = 0)
+-- LTLSPEC G(state = coin -> F(state != coin))
+--12
+LTLSPEC G(stored <= 3)

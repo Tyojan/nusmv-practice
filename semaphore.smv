@@ -1,0 +1,45 @@
+--semaphore
+MODULE main
+VAR
+run : {1,2};
+semaphore : boolean;
+state_p1 : {idle, entering, critical, exiting};
+state_p2 : {idle, entering, critical, exiting};
+
+ASSIGN
+init(run) := {1,2};
+next(run) := {1,2};
+
+init(state_p1) := idle;
+next(state_p1) := 
+    case
+        run = 1 & state_p1 = idle   : {idle, entering};
+        run = 1 & state_p1 = entering & !semaphore   : critical;
+        run = 1 & state_p1 = critical   : {critical, exiting};
+        run = 1 & state_p1 = exiting   : idle;
+        TRUE    :   state_p1;
+    esac;
+
+init(state_p2) := idle;
+next(state_p2) := 
+    case
+        run = 2 & state_p2 = idle   : {idle, entering};
+        run = 2 & state_p2 = entering & !semaphore   : critical;
+        run = 2 & state_p2 = critical   : {critical, exiting};
+        run = 2 & state_p2 = exiting   : idle;
+        TRUE    :   state_p2;
+    esac;
+
+init(semaphore) := FALSE;
+next(semaphore) :=
+    case
+        run = 1 & state_p1 = entering : TRUE;
+        run = 1 & state_p1 = exiting : FALSE;
+        run = 2 & state_p2 = entering : TRUE;
+        run = 2 & state_p2 = exiting : FALSE;
+        TRUE    :   semaphore;
+    esac;
+
+LTLSPEC G!((state_p1 = critical) & (state_p2 = critical))
+LTLSPEC G((state_p1 = entering) -> F(state_p1 = critical))
+LTLSPEC (G(F run = 1)) & (G(F run = 2)) -> G((state_p1 = entering) -> F(state_p1 = critical))

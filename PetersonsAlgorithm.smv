@@ -1,0 +1,86 @@
+MODULE program1(w0,w1,last)
+VAR
+L   :  {0,1,2,3,4,5,6};
+
+ASSIGN
+init(L) := 0;
+next(L) :=
+    case
+        L = 0  : 1;
+        L = 1  : 2;
+        L = 2  : 3;
+        L = 3  : 4;
+        L = 4 & (w1 & last = 0) : 4;
+        L = 4 & !(w1 & last = 0) : 5;
+        L = 5  : 6;
+        L = 6  : 0;
+        TRUE    :   L;
+    esac;        
+
+
+next(w0)    :=
+    case
+        L = 2   :   TRUE;
+        TRUE    :   w0;
+    esac;
+
+next(last)    :=
+    case
+        L = 3   :   0;
+        TRUE    :   last;
+    esac;
+
+JUSTICE running
+
+
+MODULE program2(w0,w1,last)
+VAR
+L   :  {a,b,c,d,e,f,g};
+
+ASSIGN
+init(L) := a;
+next(L) :=
+    case
+        L = a  : b;
+        L = b  : c;
+        L = c  : d;
+        L = d  : e;
+        L = e & (w0 & last = 1) : e;
+        L = e & !(w0 & last = 1) : f;
+        L = f  : g;
+        L = g  : a;
+        TRUE    :   L;
+    esac;        
+
+
+next(w1)    :=
+    case
+        L = c   :   TRUE;
+        TRUE    :   w1;
+    esac;
+
+next(last)    :=
+    case
+        L = d   :   1;
+        TRUE    :   last;
+    esac;
+
+JUSTICE running
+
+
+MODULE main
+VAR
+    w0  :   boolean;
+    w1  :   boolean;
+    last    :   {0,1};
+    p1: process program1(w0,w1,last);
+    p2: process program2(w0,w1,last);
+
+ASSIGN
+    init(w0) := FALSE;
+    init(w1) := FALSE;
+    init(last) := 0;
+
+
+LTLSPEC !G(p1.L = 5 & p2.L = f)
+LTLSPEC G(F(p1.L = 5)) & G(F(p2.L = f))

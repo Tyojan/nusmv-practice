@@ -1,0 +1,28 @@
+MODULE m1
+VAR
+s   :   {a, b};
+ASSIGN
+init(s) :=  a;
+next(s) := 
+    case
+        s = a   :   b;
+        s = b   :   a;
+    esac;
+
+
+MODULE m2
+VAR
+t   :   {c, d};
+ASSIGN
+init(t) :=  c;
+next(t) := 
+    case
+        t = c   :   d;
+        t = d   :   c;
+    esac;
+
+MODULE main
+VAR
+    p1  :   m1;
+    p2  :   m2;
+    

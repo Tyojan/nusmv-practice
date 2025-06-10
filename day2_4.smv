@@ -1,0 +1,94 @@
+--pazzle
+
+MODULE main
+
+VAR
+
+emp : {nw, n, ne, w, ct, e, sw, s, se};
+n1 : {nw, n, ne, w, ct, e, sw, s, se};
+n2 : {nw, n, ne, w, ct, e, sw, s, se};
+n3 : {nw, n, ne, w, ct, e, sw, s, se};
+n4 : {nw, n, ne, w, ct, e, sw, s, se};
+n5 : {nw, n, ne, w, ct, e, sw, s, se};
+n6 : {nw, n, ne, w, ct, e, sw, s, se};
+n7 : {nw, n, ne, w, ct, e, sw, s, se};
+n8 : {nw, n, ne, w, ct, e, sw, s, se};
+n9 : {nw, n, ne, w, ct, e, sw, s, se};
+le : {nw, n, ne, w, ct, e, sw, s, se};
+
+step : boolean;
+
+ASSIGN
+
+init(emp) := se;
+next(emp) :=case
+    step & emp = nw: {w,n};
+    step & emp = n: {nw,ne,ct};
+    step & emp = ne: {n,e};
+    step & emp = w: {nw,ct,sw};
+    step & emp = ct: {w,n,e,s};
+    step & emp = e: {ct,ne,se};
+    step & emp = sw: {w,s};
+    step & emp = s: {sw,ct,se};
+    step & emp = se: {s,e};
+    TRUE    : emp;
+        esac;
+
+
+
+init(le) := se;
+next(le) := emp;
+
+init(step) := TRUE;
+next(step) := !step;
+
+init(n1) := nw;
+next(n1) := case
+    !step & n1 = emp:   le;
+    TRUE    :   n1;
+        esac;
+
+init(n2) := n;
+next(n2) := case
+    !step & n2 = emp:   le;
+    TRUE    :   n2;
+        esac;
+
+init(n3) := ne;
+next(n3) := case
+    !step & n3 = emp:   le;
+    TRUE    :   n3;
+        esac;        
+
+init(n4) := w;
+next(n4) := case
+    !step & n4 = emp:   le;
+    TRUE    :   n4;
+        esac;
+
+init(n5) := ct;
+next(n5) := case
+    !step & n5 = emp:   le;
+    TRUE    :   n5;
+        esac;
+
+init(n6) := e;
+next(n6) := case
+    !step & n6 = emp:   le;
+    TRUE    :   n6;
+        esac;
+
+init(n7) := sw;
+next(n7) := case
+    !step & n7 = emp:   le;
+    TRUE    :   n7;
+        esac;
+
+init(n8) := s;
+next(n8) := case
+    !step & n8 = emp:   le;
+    TRUE    :   n8;
+        esac;
+
+
+LTLSPEC !F(n1 = s & n2 = sw & n3 = e & n4 = ct & n5 = w & n6 =ne & n7 = n & n8 = nw & emp =se)

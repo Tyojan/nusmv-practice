@@ -1,0 +1,47 @@
+MODULE program1(b)
+VAR
+L   :  {P1,P2};
+
+ASSIGN
+init(L) := P1;
+next(L) :=
+    case
+        L = P1  : P2;
+        L = P2  : P1;
+    esac;        
+
+next(b) :=  TRUE;
+
+JUSTICE running
+
+MODULE program2(b)
+VAR
+L   :  {P3,P4};
+
+ASSIGN
+init(L) := P3;
+next(L) :=
+    case
+        L = P3: P4;
+        L = P4: P3;
+    esac;
+
+next(b)   := 
+    case
+        L   =   P4: !b;
+        TRUE    :   b;
+    esac;
+
+JUSTICE running
+
+
+MODULE main
+VAR
+    b   :   boolean;
+    p1: process program1(b);
+    p2: process program2(b);                
+
+ASSIGN
+    init(b) := TRUE;
+
+LTLSPEC G((p1.L = P2 & p2.L = P4 & b = FALSE) -> F(p1.L = P1 & p2.L = P3 & b = FALSE))

@@ -1,0 +1,61 @@
+MODULE program(Ex, Ret)
+VAR
+state   :  {s1,s2,s3,s4};
+
+ASSIGN
+init(state) := s1;
+next(state) :=
+    case
+        state = s4 & Ret :   s1;
+        state != s4 & Ex  :   s4;
+        state = s1  : s2;
+        state = s2  : s3;
+        state = s3  : s1;
+        TRUE    :   state;
+    esac;        
+
+next(Ex) := 
+    case
+        state != s4 :   {TRUE,FALSE};
+        TRUE    :   Ex;
+    esac;
+
+JUSTICE running
+
+
+
+MODULE exception_handler(Ex,Ret)
+VAR
+state   :  {a,b,c};
+
+ASSIGN
+init(state) := a;
+next(state) :=
+    case
+        state = a & Ex  :   b;
+        state = b   :   c;
+        state = c   :   a;
+        TRUE    :   state;
+    esac;
+
+next(Ret)   :=
+    case
+        state = c:  TRUE;
+        TRUE :  FALSE;
+    esac;
+
+JUSTICE running
+
+
+MODULE main
+VAR
+    Ex  :   boolean;
+    Ret :   boolean;
+    p1: process program(Ex, Ret);
+    p2: process exception_handler(Ex, Ret);                
+
+ASSIGN
+    init(Ex)    := FALSE;
+    init(Ret)    := FALSE;
+
+LTLSPEC G(F(p1.state = s4) -> F(p1.state !=  s4))

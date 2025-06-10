@@ -1,0 +1,33 @@
+--stairs 9.2
+MODULE main
+VAR
+
+posA    :   0..11;
+posB    :   0..11;
+
+ASSIGN
+
+init(posA)  := 0;
+init(posB)  := 0;
+
+next(posA)  :=
+    case
+        posA    >=  10  |   posB    >=  10   :   posA;
+        --posA < posB + 3 :   {posA + 1, posA + 2};
+        posA < posB + 3 :   {posA, posA + 1, posA + 2};
+        posA >= posB + 3 :   posB;
+    esac;
+
+next(posB)  :=
+    case
+        posA    >=  10  |   posB    >=  10   :   posB;
+        posB < posA + 3 :   {posB + 1, posB + 2};
+        posB >= posA + 3 :   posA;
+    esac;
+
+--LTLSPEC F(posA >= 10 | posB >= 10)
+--LTLSPEC G(posA - posB < 4 & posB - posA < 4)
+
+LTLSPEC (posA < 10) U (posA < 10 & posB >= 10)
+--LTLSPEC G((posA >= 8) -> F(posA >= 10))
+--LTLSPEC !F((posA = 5) & F(!(posA = 5) & F(posA = 5)))

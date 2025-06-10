@@ -1,0 +1,27 @@
+MODULE main
+VAR
+n   :   {Small, Just, Large};
+pc  :   {L1,L2,L3,L4,L5};
+
+ASSIGN
+init(pc)    :=  L1;
+next(pc)    :=
+    case
+        pc = L1 & (n = Small | n = Large)   :   L2;
+        pc = L1 & !(n = Small | n = Large)   :   L5;
+        pc = L2 & n = Small :   L3;
+        pc = L2 & n != Small :   L4;
+        pc = L3 :   L1;
+        pc = L4 :   L1;
+        pc = L5 :   L5;
+    esac;
+
+init(n) := {Small, Just, Large};
+next(n) := 
+    case
+        pc = L3 :   {Small, Just};
+        pc = L4 :   {Large, Just};
+        TRUE    :   n;
+    esac;
+
+LTLSPEC  G((pc = L3) -> F(n = Just)) & G((pc = L4) -> F(n = Just)) -> F(pc = L5)

@@ -1,0 +1,156 @@
+--Rabbit and Wolf
+MODULE main
+VAR
+
+ManA : {0,1};
+ManB : {0,1};
+ManS : {0,1};
+ManM : {0,1};
+
+WolA : {0,1};
+WolB : {0,1};
+WolS : {0,1};
+WolM : {0,1};
+
+ShpA : {0,1};
+ShpB : {0,1};
+ShpS : {0,1};
+ShpM : {0,1};
+
+CabA : {0,1};
+CabB : {0,1};
+CabS : {0,1};
+CabM : {0,1};
+
+Splace : {0, bankA, AtoB, bankB, BtoA};
+
+
+ASSIGN
+init(ManA) := 1;
+init(ManB) := 0;
+init(ManS) := 0;
+init(ManM) := 0;
+init(WolA) := 1;
+init(WolB) := 0;
+init(WolS) := 0;
+init(WolM) := 0;
+init(ShpA) := 1;
+init(ShpB) := 0;
+init(ShpS) := 0;
+init(ShpM) := 0;
+init(CabA) := 1;
+init(CabB) := 0;
+init(CabS) := 0;
+init(CabM) := 0;
+
+init(Splace):=0;
+
+next(Splace):=case
+                Splace = 0 :bankA;
+                Splace = bankA : AtoB;
+                Splace = AtoB : bankB;
+                Splace = bankB : BtoA;
+                Splace = BtoA : bankA;
+            esac;
+
+next(ManM):={0,1};
+next(WolM):={0,1};
+next(ShpM):={0,1};
+next(CabM):={0,1};
+
+
+
+next(ManA):=case
+            Splace = bankA & ManM = 1 : 0;
+            Splace = BtoA & ManS = 1 : 1;
+            TRUE : ManA;
+            esac;
+
+next(WolA):=case
+            Splace = bankA & WolM = 1 : 0;
+            Splace = BtoA & WolS = 1 : 1;
+            TRUE :WolA;
+            esac;
+
+next(ShpA):=case
+            Splace = bankA & ShpM = 1 : 0;
+            Splace = BtoA & ShpS = 1 : 1;
+            TRUE : ShpA;
+            esac;
+
+next(CabA):=case
+            Splace = bankA & CabM = 1 : 0;
+            Splace = BtoA & CabS = 1 : 1;
+            TRUE :CabA;
+            esac;
+
+
+next(ManB):=case
+            Splace = AtoB & ManS = 1 : 1;
+            Splace = bankB & ManM = 1 : 0;
+            TRUE : ManB;
+            esac;
+
+next(WolB):=case
+            Splace = AtoB & WolS = 1 : 1;
+            Splace = bankB & WolM = 1 : 0;
+            TRUE : WolB;
+            esac;
+
+next(ShpB):=case
+            Splace = AtoB & ShpS = 1 : 1;
+            Splace = bankB & ShpM = 1 : 0;
+            TRUE : ShpB;
+            esac;
+
+next(CabB):=case
+            Splace = AtoB & CabS = 1 : 1;
+            Splace = bankB & CabM = 1 : 0;
+            TRUE : CabB;
+            esac;
+
+
+
+next(ManS):=case
+            Splace = bankA : ManM;
+            Splace = AtoB : 0;
+            Splace = bankB : ManM;
+            Splace = BtoA : 0;
+            TRUE : ManS;
+            esac;
+
+next(WolS):=case
+            Splace = bankA : WolM;
+            Splace = AtoB : 0;
+            Splace = bankB : WolM;
+            Splace = BtoA : 0;
+            TRUE : WolS;
+            esac;
+           
+next(ShpS):=case
+            Splace = bankA : ShpM;
+            Splace = AtoB : 0;
+            Splace = bankB : ShpM;
+            Splace = BtoA : 0;
+            TRUE : ShpS;
+            esac;
+
+next(CabS):=case
+            Splace = bankA : CabM;
+            Splace = AtoB : 0;
+            Splace = bankB : CabM;
+            Splace = BtoA : 0;
+            TRUE : CabS;
+            esac;
+
+
+DEFINE
+    goal := ManB = 1 & WolB = 1 & ShpB = 1 & CabB = 1;
+    safe_A := !((ManA = 0) & ((WolA = 1 & ShpA = 1) | (ShpA = 1 & CabA = 1)));
+    safe_B := !((ManB = 0) & ((WolB = 1 & ShpB = 1) | (ShpB = 1 & CabB = 1)));
+    psgr_A := (Splace = bankA) -> (ManA >= ManM & WolA >= WolM & ShpA >= ShpM & CabA >= CabM);
+    psgr_B := (Splace = bankB) -> (ManB >= ManM & WolB >= WolM & ShpB >= ShpM & CabB >= CabM);
+    crew := !(Splace = AtoB | Splace = BtoA) | (ManS = 1 & (WolS + ShpS + CabS <= 1));
+    rule := safe_A & safe_B & crew & psgr_A & psgr_B;
+
+LTLSPEC !(rule U goal)

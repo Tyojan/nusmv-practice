@@ -1,0 +1,37 @@
+MODULE bc
+VAR
+x  :   {0,1};
+
+ASSIGN
+init(x) := 0;
+next(x) :=
+    case
+        x = 0 :   1;
+        x = 1 :   0;
+    esac;
+
+
+JUSTICE running
+
+MODULE tc
+VAR
+y   :  {0,1,2};
+
+ASSIGN
+init(y)   :=  0;
+next(y)   :=
+    case
+        y = 0 :   1;
+        y = 1 :   2;
+        y = 2 :   0;
+    esac;
+
+JUSTICE running
+
+
+MODULE main
+VAR
+    p1: process bc;
+    p2: process tc;                
+
+LTLSPEC F(p1.x=1 & p2.y=2)

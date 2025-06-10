@@ -1,0 +1,93 @@
+--Rabbit and Wolf
+MODULE main
+VAR
+
+RbA : 0..3;
+RbB : 0..3;
+RbS : 0..2;
+
+WoA : 0..3;
+WoB : 0..3;
+WoS : 0..2;
+
+RbSM : 0..2;
+WoSM : 0..2;
+
+Splace : {0, bankA, AtoB, bankB, BtoA};
+
+
+ASSIGN
+init(RbA) := 3;
+init(RbB) := 0;
+init(RbS) := 0;
+init(WoA) := 3;
+init(WoB) := 0;
+init(WoS) := 0;
+
+init(RbSM) := 0;
+init(WoSM) := 0;
+init(Splace):=0;
+
+next(Splace):=case
+                Splace = 0 :bankA;
+                Splace = bankA : AtoB;
+                Splace = AtoB : bankB;
+                Splace = bankB : BtoA;
+                Splace = BtoA : bankA;
+            esac;
+
+
+next(RbSM):={0,1,2};
+next(WoSM):={0,1,2};
+
+next(RbA):=case
+            Splace = bankA & RbA - RbSM >= 0 : RbA - RbSM;
+            Splace = BtoA & RbA + RbS <= 3 : RbA + RbS;
+            TRUE : RbA;
+            esac;
+
+next(WoA):=case
+            Splace = bankA & WoA - WoSM >= 0 : WoA - WoSM;
+            Splace = BtoA & WoA + WoS <= 3 : WoA + WoS;
+            TRUE :WoA;
+            esac;
+
+next(RbB):=case
+            Splace = bankB & RbB - RbSM >= 0 : RbB - RbSM;
+            Splace = AtoB & RbB + RbS <= 3 : RbB + RbS;
+            TRUE : RbB;
+            esac;
+
+next(WoB):=case
+            Splace = bankB & WoB - WoSM >= 0 : WoB - WoSM;
+            Splace = AtoB & WoB + WoS <= 3 : WoB + WoS;
+            TRUE : WoB;
+            esac;
+
+next(RbS):=case
+            Splace = bankA : RbSM;
+            Splace = AtoB : 0;
+            Splace = bankB : RbSM;
+            Splace = BtoA : 0;
+            TRUE : RbS;
+            esac;
+
+next(WoS):=case
+            Splace = bankA : WoSM;
+            Splace = AtoB : 0;
+            Splace = bankB : WoSM;
+            Splace = BtoA : 0;
+            TRUE : WoS;
+            esac;
+           
+
+
+DEFINE
+    goal := RbB = 3 & WoB = 3;
+    safe := ((RbA >= WoA) | (RbA = 0)) & ((RbB >= WoB) | (RbB = 0)) & ((RbS >= WoS) | (RbS = 0));
+    crew := !(Splace=AtoB | Splace=BtoA) | (RbS+WoS=1 | RbS+WoS=2);
+    a_ok := (Splace=bankA -> (RbA>=RbSM)&(WoA>=WoSM));
+    b_ok := (Splace=bankB -> (RbB>=RbSM)&(WoB>=WoSM));
+    rule := safe & crew & a_ok & b_ok;
+
+LTLSPEC !(rule U goal)

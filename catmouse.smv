@@ -1,0 +1,75 @@
+MODULE cat(turn, cat_pos, mos_pos)
+VAR
+pos_pre :   {Bl,Wh};
+ASSIGN
+init(pos_pre)   :=  Bl;
+next(pos_pre)   :=
+    case
+    turn    :   cat_pos;
+    TRUE    :   pos_pre;
+    esac;
+
+next(cat_pos)   :=
+    case
+        turn    :
+            case
+                cat_pos = Bl    :   Wh;
+                cat_pos = Wh    :   {Bl,Wh};
+            esac;
+        TRUE    :
+            cat_pos;
+    esac;
+
+MODULE mouse(turn, cat_pos, mos_pos)
+VAR
+pos_pre :   {Bl,Wh};
+ASSIGN
+init(pos_pre)   :=  Bl;
+next(pos_pre)   :=
+    case
+    !turn    :   mos_pos;
+    TRUE    :   pos_pre;
+    esac;
+
+next(mos_pos)   :=
+    case
+        !turn    :
+            case
+                mos_pos = Bl    :   Wh;
+                mos_pos = Wh    :   {Bl,Wh};
+            esac;
+        TRUE    :
+            mos_pos;
+    esac;
+
+MODULE main
+VAR
+cat :   cat(turn, cat_pos, mos_pos);
+mos :   mouse(turn, cat_pos, mos_pos);
+turn    :   boolean;
+msh :   boolean;
+csh :   boolean;
+cat_pos :   {Bl, Wh};
+mos_pos :   {Bl, Wh};
+
+ASSIGN
+init(cat_pos)   := Wh;
+init(mos_pos)   := Bl;
+init(turn)  :=  FALSE;
+next(turn)  :=  !turn;
+init(msh)   := FALSE;
+init(csh)   := FALSE;
+
+next(msh)   :=
+    case
+        turn & (mos.pos_pre = Wh & mos.pos_pre = Wh) :  !msh;
+        TRUE    :   msh;
+    esac;        
+
+next(csh)   :=
+    case
+        !turn & (cat.pos_pre = Wh & cat.pos_pre = Wh) :  !csh;
+        TRUE    :   csh;
+    esac;    
+
+LTLSPEC G((G !msh & F G csh) -> F(!turn & cat_pos = mos_pos))

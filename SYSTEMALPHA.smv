@@ -1,0 +1,30 @@
+----SYSTEMALPHA.smv
+MODULE main
+
+VAR
+    a : {0, 1, 2};
+    b : {0, 1, 2};
+    sw: {on, off};
+
+ASSIGN
+init(a) := 0;
+next(a) := case
+            b = 1 : a;
+            TRUE     : (a + 1) mod 3;
+            esac;
+
+init(b) := 0;
+next(b) := case
+            a = b : b;
+            TRUE     : (b + 1) mod 3;
+            esac;
+
+init(sw) := off;
+next(sw) := case
+            a = 2 & b = 2 : on;
+            a = 1 & b = 1 : off;
+            TRUE             : sw;
+            esac;
+
+LTLSPEC G (sw = off -> F(sw = on))
+LTLSPEC G (sw = on -> F(sw = off))

@@ -1,0 +1,107 @@
+*** This is NuSMV 2.6.0 (compiled on Wed Oct 14 15:35:00 2015)
+*** Enabled addons are: compass
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Please report bugs to <Please report bugs to <nusmv-users@fbk.eu>>
+
+*** Copyright (c) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of NuSMV is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of NuSMV is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+WARNING *** This version of NuSMV is linked to the zchaff SAT         ***
+WARNING *** solver (see http://www.princeton.edu/~chaff/zchaff.html). ***
+WARNING *** Zchaff is used in Bounded Model Checking when the         ***
+WARNING *** system variable "sat_solver" is set to "zchaff".          ***
+WARNING *** Notice that zchaff is for non-commercial purposes only.   ***
+WARNING *** NO COMMERCIAL USE OF ZCHAFF IS ALLOWED WITHOUT WRITTEN    ***
+WARNING *** PERMISSION FROM PRINCETON UNIVERSITY.                     ***
+WARNING *** Please contact Sharad Malik (malik@ee.princeton.edu)      ***
+WARNING *** for details.                                              ***
+
+-- specification  G (((clk & state = unpower) & power) ->  F state = standby)  is true
+-- specification  G (((clk & state = unpower) & !power) ->  F state = unpower)  is true
+-- specification  G (((((clk & power) & state = standby) & coinIn) & (canA > 0 | canB > 0)) ->  F state = coin)  is true
+-- specification  G (((((clk & power) & state = coin) & coinIn) & stored < 3) ->  F stored <= 3)  is true
+-- specification  G (((clk & state = standby) & !power) ->  F state = unpower)  is true
+-- specification  G (state = unpower -> stored = 0)  is true
+-- specification  G stored <= 3  is true
+-- specification  G (((((clk & state = standby) & coinIn) & canA = 0) & canB = 0) ->  F change = 1)  is true
+-- specification  G (((((clk & power) & state = coin) & coinIn) & stored = 3) ->  X ( X change = 1))  is false
+-- as demonstrated by the following execution sequence
+Trace Description: LTL Counterexample 
+Trace Type: Counterexample 
+  -> State: 1.1 <-
+    canA = 5
+    canB = 5
+    stored = 0
+    change = 0
+    state = unpower
+    power = FALSE
+    coinIn = FALSE
+    buttonA = FALSE
+    buttonB = FALSE
+    product = no
+    clk = FALSE
+  -> State: 1.2 <-
+    power = TRUE
+    clk = TRUE
+  -> State: 1.3 <-
+    state = standby
+    clk = FALSE
+  -> State: 1.4 <-
+    coinIn = TRUE
+    clk = TRUE
+  -> State: 1.5 <-
+    state = coin
+    coinIn = FALSE
+    clk = FALSE
+  -> State: 1.6 <-
+    coinIn = TRUE
+    clk = TRUE
+  -> State: 1.7 <-
+    stored = 1
+    coinIn = FALSE
+    clk = FALSE
+  -> State: 1.8 <-
+    coinIn = TRUE
+    clk = TRUE
+  -> State: 1.9 <-
+    stored = 2
+    coinIn = FALSE
+    clk = FALSE
+  -> State: 1.10 <-
+    coinIn = TRUE
+    buttonA = TRUE
+    clk = TRUE
+  -> State: 1.11 <-
+    stored = 3
+    change = 1
+    coinIn = FALSE
+    buttonA = FALSE
+    product = JuiceA
+    clk = FALSE
+  -> State: 1.12 <-
+    change = 0
+    coinIn = TRUE
+    product = no
+    clk = TRUE
+  -> State: 1.13 <-
+    change = 1
+    coinIn = FALSE
+    clk = FALSE
+  -- Loop starts here
+  -> State: 1.14 <-
+    change = 0
+    clk = TRUE
+  -> State: 1.15 <-
+    clk = FALSE
+  -> State: 1.16 <-
+    clk = TRUE
+-- specification  G (((((clk & power) & state = coin) & coinIn) & stored < 3) ->  F change = 0)  is true
+-- specification  G ((((clk & state = unpower) & !power) & coinIn) ->  F change = 1)  is true

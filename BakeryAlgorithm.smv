@@ -1,0 +1,77 @@
+MODULE program1(xy)
+VAR
+L   :  {1,2,3,4,5,6};
+
+ASSIGN
+init(L) := 1;
+next(L) :=
+    case
+        L = 1  : 2;
+        L = 2  : 3;
+        L = 3  : 4;
+        L = 4 & xy = pl : 4;
+        L = 4 & xy != pl: 5;
+        L = 5  : 6;
+        L = 6  : 1;
+        TRUE    :   L;
+    esac;        
+
+
+next(xy)    :=
+    case
+        L = 3   & xy = ZZ   :   pZ;
+        L = 3   & xy = Zp   :   pl;
+        L = 3   & xy = Zp   :   pl;
+        L = 3   & xy = pEq   :   pl;
+        L = 6   & xy = pZ   :   ZZ;
+        L = 6   & xy = pl   :   Zp;
+        L = 6   & xy = lp   :   Zp;
+        L = 6   & xy = pEq   :   Zp;
+        TRUE    :   xy;
+    esac;
+
+
+
+JUSTICE running
+
+
+MODULE program2(xy)
+VAR
+L   :  {a,b,c,d,e,f};
+
+ASSIGN
+init(L) := a;
+next(L) :=
+    case
+        L = a  : b;
+        L = b  : c;
+        L = c  : d;
+        L = d & xy = lp : d;
+        L = d & xy != lp : e;
+        L = e  : f;
+        L = f  : a;
+        TRUE    :   L;
+    esac;        
+
+
+next(xy)    :=
+    case
+        L = c   :   TRUE;
+        TRUE    :   xy;
+    esac;
+
+
+JUSTICE running
+
+
+MODULE main
+VAR
+    xy  :   {ZZ, Zp, pZ, lp, pl, pEq};
+
+    p1: process program1(xy);
+    p2: process program2(xy);
+
+ASSIGN
+    init(xy) := ZZ;
+
+

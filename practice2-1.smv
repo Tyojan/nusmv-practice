@@ -1,0 +1,48 @@
+MODULE clock
+VAR
+HH  :   {00,02,04,06,08,10};
+
+ASSIGN
+init(HH) := 00;
+next(HH) :=
+    case
+        HH = 00 :   02;
+        HH = 02 :   04;
+        HH = 04 :   06;
+        HH = 06 :   08;
+        HH = 08 :   10;
+        HH = 10 :   00;
+    esac;
+
+
+MODULE timer
+VAR
+set :  {-1,0,1,2,3};
+alarm   :   boolean;
+
+ASSIGN
+init(set)   :=  -1;
+next(set)   :=
+    case
+        set = -1    :   {-1,1,2,3};
+        set = 0 :   -1;
+        set = 1 :   0;
+        set = 2 :   1;
+        set = 3 :   2;
+    esac;
+
+init(alarm) :=  FALSE;
+next(alarm) :=
+    case
+        set = 0 :   TRUE;
+        TRUE    :   FALSE;
+    esac;
+
+
+MODULE main
+VAR
+    p1: clock;
+    p2: timer;                
+
+LTLSPEC F(p1.HH = 04)
+LTLSPEC G(p2.set >= 1 -> F!(p2.set >= 1))

@@ -1,0 +1,234 @@
+--Three couples
+MODULE main
+VAR
+
+Couple1HA : {0,1};
+Couple1HB : {0,1};
+Couple1HS : {0,1};
+Couple1HM : {0,1};
+
+Couple1WA : {0,1};
+Couple1WB : {0,1};
+Couple1WS : {0,1};
+Couple1WM : {0,1};
+
+Couple2HA : {0,1};
+Couple2HB : {0,1};
+Couple2HS : {0,1};
+Couple2HM : {0,1};
+
+Couple2WA : {0,1};
+Couple2WB : {0,1};
+Couple2WS : {0,1};
+Couple2WM : {0,1};
+
+Couple3HA : {0,1};
+Couple3HB : {0,1};
+Couple3HS : {0,1};
+Couple3HM : {0,1};
+
+Couple3WA : {0,1};
+Couple3WB : {0,1};
+Couple3WS : {0,1};
+Couple3WM : {0,1};
+
+Splace : {0, bankA, AtoB, bankB, BtoA};
+
+
+ASSIGN
+init(Couple1HA) := 1;
+init(Couple1HB) := 0;
+init(Couple1HS) := 0;
+init(Couple1HM) := 0;
+
+init(Couple1WA) := 1;
+init(Couple1WB) := 0;
+init(Couple1WS) := 0;
+init(Couple1WM) := 0;
+
+init(Couple2HA) := 1;
+init(Couple2HB) := 0;
+init(Couple2HS) := 0;
+init(Couple2HM) := 0;
+
+init(Couple2WA) := 1;
+init(Couple2WB) := 0;
+init(Couple2WS) := 0;
+init(Couple2WM) := 0;
+
+init(Couple3HA) := 1;
+init(Couple3HB) := 0;
+init(Couple3HS) := 0;
+init(Couple3HM) := 0;
+
+init(Couple3WA) := 1;
+init(Couple3WB) := 0;
+init(Couple3WS) := 0;
+init(Couple3WM) := 0;
+
+init(Splace):=0;
+
+next(Splace):=case
+                Splace = 0 :bankA;
+                Splace = bankA : AtoB;
+                Splace = AtoB : bankB;
+                Splace = bankB : BtoA;
+                Splace = BtoA : bankA;
+            esac;
+
+next(Couple1HM):={0,1};
+next(Couple1WM):={0,1};
+next(Couple2HM):={0,1};
+next(Couple2WM):={0,1};
+next(Couple3HM):={0,1};
+next(Couple3WM):={0,1};
+
+next(Couple1HA):=case
+            Splace = bankA & Couple1HM = 1 : 0;
+            Splace = BtoA & Couple1HS = 1 : 1;
+            TRUE : Couple1HA;
+            esac;
+
+next(Couple1HB):=case
+            Splace = AtoB & Couple1HS = 1 : 1;
+            Splace = bankB & Couple1HM = 1 : 0;
+            TRUE : Couple1HB;
+            esac;
+
+next(Couple1HS):=case
+            Splace = bankA : Couple1HM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple1HM;
+            Splace = BtoA : 0;
+            TRUE : Couple1HS;
+            esac;
+
+next(Couple1WA):=case
+            Splace = bankA & Couple1WM = 1 : 0;
+            Splace = BtoA & Couple1WS = 1 : 1;
+            TRUE : Couple1WA;
+            esac;
+
+next(Couple1WB):=case
+            Splace = AtoB & Couple1WS = 1 : 1;
+            Splace = bankB & Couple1WM = 1 : 0;
+            TRUE : Couple1WB;
+            esac;
+
+next(Couple1WS):=case
+            Splace = bankA : Couple1WM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple1WM;
+            Splace = BtoA : 0;
+            TRUE : Couple1WS;
+            esac;
+
+next(Couple2HA):=case
+            Splace = bankA & Couple2HM = 1 : 0;
+            Splace = BtoA & Couple2HS = 1 : 1;
+            TRUE : Couple2HA;
+            esac;
+
+next(Couple2HB):=case
+            Splace = AtoB & Couple2HS = 1 : 1;
+            Splace = bankB & Couple2HM = 1 : 0;
+            TRUE : Couple2HB;
+            esac;
+
+next(Couple2HS):=case
+            Splace = bankA : Couple2HM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple2HM;
+            Splace = BtoA : 0;
+            TRUE : Couple2HS;
+            esac;
+
+next(Couple2WA):=case
+            Splace = bankA & Couple2WM = 1 : 0;
+            Splace = BtoA & Couple2WS = 1 : 1;
+            TRUE : Couple2WA;
+            esac;
+
+next(Couple2WB):=case
+            Splace = AtoB & Couple2WS = 1 : 1;
+            Splace = bankB & Couple2WM = 1 : 0;
+            TRUE : Couple2WB;
+            esac;
+
+next(Couple2WS):=case
+            Splace = bankA : Couple2WM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple2WM;
+            Splace = BtoA : 0;
+            TRUE : Couple2WS;
+            esac;
+
+next(Couple3HA):=case
+            Splace = bankA & Couple3HM = 1 : 0;
+            Splace = BtoA & Couple3HS = 1 : 1;
+            TRUE : Couple3HA;
+            esac;
+
+next(Couple3HB):=case
+            Splace = AtoB & Couple3HS = 1 : 1;
+            Splace = bankB & Couple3HM = 1 : 0;
+            TRUE : Couple3HB;
+            esac;
+
+next(Couple3HS):=case
+            Splace = bankA : Couple3HM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple3HM;
+            Splace = BtoA : 0;
+            TRUE : Couple3HS;
+            esac;
+
+next(Couple3WA):=case
+            Splace = bankA & Couple3WM = 1 : 0;
+            Splace = BtoA & Couple3WS = 1 : 1;
+            TRUE : Couple3WA;
+            esac;
+
+next(Couple3WB):=case
+            Splace = AtoB & Couple3WS = 1 : 1;
+            Splace = bankB & Couple3WM = 1 : 0;
+            TRUE : Couple3WB;
+            esac;
+
+next(Couple3WS):=case
+            Splace = bankA : Couple3WM;
+            Splace = AtoB : 0;
+            Splace = bankB : Couple3WM;
+            Splace = BtoA : 0;
+            TRUE : Couple3WS;
+            esac;            
+
+
+
+DEFINE
+    goal := Couple1HB = 1 & Couple1WB = 1 & Couple2HB = 1 & Couple2WB = 1 & Couple3HB = 1 & Couple3WB = 1;
+        
+    crew := !(Splace = AtoB | Splace = BtoA) | (Couple1HS + Couple1WS + Couple2HS + Couple2WS + Couple3HS + Couple3WS = 1) | (Couple1HS + Couple1WS + Couple2HS + Couple2WS + Couple3HS + Couple3WS = 2);
+
+    safe_S := !((Couple1HS = 1 & (Couple2WS = 1 | Couple3WS = 1)) | (Couple1WS = 1 & (Couple2HS = 1 | Couple3HS = 1)) |(Couple2HS = 1 &  Couple3WS = 1) | (Couple2WS = 1 & Couple3HS = 1));
+
+    safe_C1HA := !((Couple1HA = 1 & Couple1WA = 0) & ((Couple2HA = 0 & Couple2WA = 1) | (Couple3HA = 0 & Couple3WA = 1)));
+    safe_C1HB := !((Couple1HB = 1 & Couple1WB = 0) & ((Couple2HB = 0 & Couple2WB = 1) | (Couple3HB = 0 & Couple3WB = 1)));
+    safe_C1WA := !((Couple1HA = 0 & Couple1WA = 1) & ((Couple2HA = 1 & Couple2WA = 0) | (Couple3HA = 1 & Couple3WA = 0)));
+    safe_C1WB := !((Couple1HB = 0 & Couple1WB = 1) & ((Couple2HB = 1 & Couple2WB = 0) | (Couple3HB = 1 & Couple3WB = 0)));
+
+    safe_C2HA := !((Couple2HA = 1 & Couple2WA = 0) & (Couple3HA = 0 & Couple3WA = 1));
+    safe_C2HB := !((Couple2HB = 1 & Couple2WB = 0) & (Couple3HB = 0 & Couple3WB = 1));
+    safe_C2WA := !((Couple2HA = 0 & Couple2WA = 1) & (Couple3HA = 1 & Couple3WA = 0));
+    safe_C2WB := !((Couple2HB = 0 & Couple2WB = 1) & (Couple3HB = 1 & Couple3WB = 0));
+
+    safe_A := safe_C1HA & safe_C1WA & safe_C2HA & safe_C2WA;
+    safe_B := safe_C1HB & safe_C1WB & safe_C2HB & safe_C2WB;
+
+    psgr_A := (Splace = bankA) -> (Couple1HA >= Couple1HM & Couple1WA >= Couple1WM & Couple2HA >= Couple2HM & Couple2WA >= Couple2WM & Couple3HA >= Couple3HM & Couple3WA >= Couple3WM);
+    psgr_B := (Splace = bankB) -> (Couple1HB >= Couple1HM & Couple1WB >= Couple1WM & Couple2HB >= Couple2HM & Couple2WB >= Couple2WM & Couple3HB >= Couple3HM & Couple3WB >= Couple3WM);
+
+
+    rule := safe_S & safe_A & safe_B & crew & psgr_A & psgr_B;
+
+LTLSPEC !(rule U goal)            

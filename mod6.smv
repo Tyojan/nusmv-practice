@@ -1,0 +1,23 @@
+--mod 6 sec.10
+MODULE main
+VAR
+
+seisuu : 1..1000;
+a   : 1..1000;
+prt :   {ok, ng};
+
+ASSIGN
+init(seisuu) := 1;
+next(seisuu) := {1..1000};
+
+a := seisuu;
+
+init(prt) := ng;
+next(prt) :=
+    case
+        (a mod 3)   =   0   :   ok;
+        TRUE    : ng;
+    esac;
+
+LTLSPEC G(((a mod 6) = 0) -> X(prt = ok))
+LTLSPEC G(((a mod 6) != 0) -> X(prt = ng))
